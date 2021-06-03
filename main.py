@@ -5,7 +5,7 @@ from random_number_generator.uniform_generator import UniformGenerator
 from random_number_generator.poisson_generator import PoissonGenerator
 from random_number_generator.bernoulli_generator import BernoulliGenerator
 from random_number_generator.binomial_generator import BinomialGenerator
-from random_number_generator.geometric_generator import GeometricGenerator
+from random_number_generator.exponential_generator import ExponentialGenerator
 
 LENGTH = 10000
 
@@ -14,16 +14,14 @@ J = UniformGenerator()
 P = PoissonGenerator()
 B = BernoulliGenerator(p=0.3)
 D = BinomialGenerator(p=0.5, n=20)
-W = GeometricGenerator()
+W = ExponentialGenerator(lambda_value=1)
 
 G_x = G.generate_array(LENGTH)
-
 plt.title('G')
 plt.hist(G_x)
 plt.show()
 
 J_x = J.generate_array(LENGTH)
-
 plt.title('J')
 plt.hist(J_x)
 plt.show()
@@ -47,5 +45,5 @@ plt.show()
 
 W_x = W.generate_array(LENGTH)
 plt.title('W')
-plt.hist(W_x, bins=max(W_x))
+plt.hist(W_x, bins=40)
 plt.show()
