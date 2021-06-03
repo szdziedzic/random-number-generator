@@ -12,8 +12,8 @@ class BernoulliGenerator:
     def generate_number(self):
         u = self.uniform_generator.generate_number()
         if u < self.p:
-            return 0
-        return 1
+            return 1
+        return 0
 
     def generate_array(self, length: int):
         arr = []
