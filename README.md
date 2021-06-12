@@ -1,6 +1,6 @@
 # random-number-generator
 
-Different kinds of RNGs corresponding to most popular probability distrubutions implemented from scratch without using time parameters.
+Different kinds of RNGs generating most popular probability distrubutions implemented from scratch without using time parameters.
 Supported distributions:
 1. Uniform
 2. Uniform (0, 1]
