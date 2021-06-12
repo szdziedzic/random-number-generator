@@ -6,6 +6,7 @@ from random_number_generator.poisson_generator import PoissonGenerator
 from random_number_generator.bernoulli_generator import BernoulliGenerator
 from random_number_generator.binomial_generator import BinomialGenerator
 from random_number_generator.exponential_generator import ExponentialGenerator
+from random_number_generator.normal_generator import NormalGenerator
 
 LENGTH = 10000
 
@@ -15,6 +16,7 @@ P = PoissonGenerator()
 B = BernoulliGenerator(p=0.3)
 D = BinomialGenerator(p=0.5, n=20)
 W = ExponentialGenerator(lambda_value=1)
+N = NormalGenerator()
 
 G_x = G.generate_array(LENGTH)
 plt.title('G')
@@ -46,4 +48,9 @@ plt.show()
 W_x = W.generate_array(LENGTH)
 plt.title('W')
 plt.hist(W_x, bins=40)
+plt.show()
+
+N_x = N.generate_array(LENGTH)
+plt.title('N')
+plt.hist(N_x, bins=40)
 plt.show()
