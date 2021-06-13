@@ -6,15 +6,16 @@ from random_number_generator.binomial_generator import BinomialGenerator
 from random_number_generator.exponential_generator import ExponentialGenerator
 from random_number_generator.normal_generator import NormalGenerator
 import scipy.stats as sp
+from scipy.integrate import quad
 import numpy as np
 import math
 
 
-def fill_obs_array(values, dist, obs: list, bins: int):
+def fill_obs_array(values, dist, obs: list, bins: int, start: float):
     for value in values:
         curr_ind = 0
         for i in range(bins):
-            if value < (i + 1) * dist:
+            if value <= (i + 1) * dist + start:
                 break
             else:
                 curr_ind = curr_ind + 1
@@ -27,6 +28,12 @@ def uniform_cdf(a, b, x):
 
 def exponential_cdf(x, lambda_value):
     return 1 - np.exp(-lambda_value * x)
+
+
+def standard_normal_pdf(x):
+    # box-mueller method generates standard normal distribution
+    # so as pdf we take fi(x)
+    return np.exp((-(x ** 2)) / 2) / np.sqrt(2 * np.pi)
 
 
 def calculate_chi_square_obs(obs: list, exp: list):
@@ -71,7 +78,7 @@ def test_generator(generator: Generator, alfa=0.05, n=100000, bins=7):
         exp.append(next_exp)
         curr_dist = curr_dist + dist
     values = generator.generate_array(n)
-    fill_obs_array(values, dist, obs, bins)
+    fill_obs_array(values, dist, obs, bins, generator.a)
     chi_square_obs = calculate_chi_square_obs(obs, exp)
     crit = sp.chi2.ppf(q=1 - alfa, df=bins - 1)
     if chi_square_obs < crit:
@@ -95,7 +102,7 @@ def test_uniform(generator: UniformGenerator, alfa=0.05, n=100000, bins=7):
         exp.append(next_exp)
         curr_dist = curr_dist + dist
     values = generator.generate_array(n)
-    fill_obs_array(values, dist, obs, bins)
+    fill_obs_array(values, dist, obs, bins, generator.generator.a / generator.generator.m)
     chi_square_obs = calculate_chi_square_obs(obs, exp)
     crit = sp.chi2.ppf(q=1 - alfa, df=bins - 1)
     if chi_square_obs < crit:
@@ -126,7 +133,7 @@ def test_binomial(generator: BinomialGenerator, alfa=0.05, n=100000, bins=7):
         curr_dist = curr_dist + dist
 
     values = generator.generate_array(n)
-    fill_obs_array(values, dist, obs, bins)
+    fill_obs_array(values, dist, obs, bins, 0)
     chi_square_obs = calculate_chi_square_obs(obs, exp)
     crit = sp.chi2.ppf(q=1 - alfa, df=bins - 1)
     if chi_square_obs < crit:
@@ -211,3 +218,25 @@ def test_poisson(generator: PoissonGenerator, alfa=0.05, n=100000, bins=7):
         print(f'POISSON TEST PASSED - crit={crit} chi_square_obs={chi_square_obs}')
     else:
         print(f'POISSON TEST FAILED - crit={crit} chi_square_obs={chi_square_obs}')
+
+
+def test_normal(generator: NormalGenerator, alfa=0.05, n=100000, bins = 7):
+    values = generator.generate_array(n)
+    dist = (max(values) - min(values)) / bins
+    curr_dist = min(values)
+    exp = []
+    for i in range(bins):
+        next_exp = quad(standard_normal_pdf, curr_dist, curr_dist + dist)[0] * n
+        if next_exp < 5:
+            print(f'exp[{i}] < 5')
+            return
+        exp.append(next_exp)
+        curr_dist = curr_dist + dist
+    obs = [0 for i in range(bins)]
+    fill_obs_array(values, dist, obs, bins, min(values))
+    chi_square_obs = calculate_chi_square_obs(obs, exp)
+    crit = sp.chi2.ppf(q=1 - alfa, df=bins - 1)
+    if chi_square_obs < crit:
+        print(f'NORMAL TEST PASSED - crit={crit} chi_square_obs={chi_square_obs}')
+    else:
+        print(f'NORMAL TEST FAILED - crit={crit} chi_square_obs={chi_square_obs}')
