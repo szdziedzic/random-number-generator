@@ -137,8 +137,8 @@ def test_binomial(generator: BinomialGenerator, alfa=0.05, n=100000, bins=7):
 
 def test_exponential(generator: ExponentialGenerator, alfa=0.05, bins=7, n=100000):
     values = generator.generate_array(n)
-    dist = (max(values) - min(values)) / bins
-    curr_dist = min(values)
+    dist = (max(values) - 0) / bins
+    curr_dist = 0
     exp = []
     for i in range(bins):
         next_exp = (exponential_cdf(curr_dist + dist, generator.lambda_value)
@@ -169,3 +169,45 @@ def test_exponential(generator: ExponentialGenerator, alfa=0.05, bins=7, n=10000
         print(f'EXPONENTIAL TEST PASSED - crit={crit} chi_square_obs={chi_square_obs}')
     else:
         print(f'EXPONENTIAL TEST FAILED - crit={crit} chi_square_obs={chi_square_obs}')
+
+
+def test_poisson(generator: PoissonGenerator, alfa=0.05, n=100000, bins=7):
+    values = generator.generate_array(n)
+    dist = (max(values) - 0) / bins
+    curr_dist = 0
+    exp = []
+    for i in range(bins):
+        lower = 0
+        if curr_dist != 0:
+            lower = int(curr_dist) + 1
+        upper = int(curr_dist + dist)
+        prob = 0
+        for j in range(lower, upper + 1):
+            prob = prob + ((np.exp(-generator.lambda_value) * generator.lambda_value ** j) / math.factorial(j))
+        next_exp = prob * n
+        if next_exp < 5:
+            exp[i - 1] = exp[i - 1] + next_exp
+            bins = i
+            break
+        exp.append(next_exp)
+        curr_dist = curr_dist + dist
+    obs = [0 for i in range(bins)]
+    for value in values:
+        curr_ind = 0
+        was_break = False
+        for i in range(bins):
+            if value < (i + 1) * dist:
+                was_break = True
+                break
+            else:
+                curr_ind = curr_ind + 1
+        if was_break:
+            obs[curr_ind] = obs[curr_ind] + 1
+        else:
+            obs[len(obs) - 1] = obs[len(obs) - 1] + 1
+    chi_square_obs = calculate_chi_square_obs(obs, exp)
+    crit = sp.chi2.ppf(q=1 - alfa, df=bins - 1)
+    if chi_square_obs < crit:
+        print(f'POISSON TEST PASSED - crit={crit} chi_square_obs={chi_square_obs}')
+    else:
+        print(f'POISSON TEST FAILED - crit={crit} chi_square_obs={chi_square_obs}')
