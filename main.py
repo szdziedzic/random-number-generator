@@ -7,6 +7,7 @@ from random_number_generator.bernoulli_generator import BernoulliGenerator
 from random_number_generator.binomial_generator import BinomialGenerator
 from random_number_generator.exponential_generator import ExponentialGenerator
 from random_number_generator.normal_generator import NormalGenerator
+from random_number_generator.chi_square import test_bernoulli, test_generator, test_uniform
 
 LENGTH = 10000
 
@@ -52,5 +53,9 @@ plt.show()
 
 N_x = N.generate_array(LENGTH)
 plt.title('N')
-plt.hist(N_x, bins=40)
+plt.hist(N_x, bins=60)
 plt.show()
+
+test_bernoulli(B, n=LENGTH)
+test_generator(G, n=LENGTH)
+test_uniform(J, n=LENGTH)

@@ -10,6 +10,7 @@ class NormalGenerator:
             self.uniform_generator = UniformGenerator()
 
     def generate_number(self):
+        # box-mueller transformation using unif(0, 1) generator
         u1 = self.uniform_generator.generate_number()
         u2 = self.uniform_generator.generate_number()
         number = np.sqrt(-2 * np.log(u1)) * np.sin(2 * np.pi * u2)
