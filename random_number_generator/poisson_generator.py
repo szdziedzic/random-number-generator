@@ -1,4 +1,4 @@
-from math import exp
+import numpy as np
 from random_number_generator.uniform_generator import UniformGenerator
 
 
@@ -13,7 +13,7 @@ class PoissonGenerator:
     def generate_number(self):
         u = self.uniform_generator.generate_number()
         x = 0
-        while u >= exp(-self.lambda_value):
+        while u >= np.exp(-self.lambda_value):
             u = u * self.uniform_generator.generate_number()
             x = x + 1
         return x

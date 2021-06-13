@@ -17,7 +17,7 @@ def fill_obs_array(values, dist, obs: list, bins: int, start: float):
         for i in range(bins):
             if value <= (i + 1) * dist + start:
                 break
-            else:
+            elif curr_ind < bins - 1:
                 curr_ind = curr_ind + 1
         obs[curr_ind] = obs[curr_ind] + 1
 
@@ -39,7 +39,8 @@ def standard_normal_pdf(x):
 def calculate_chi_square_obs(obs: list, exp: list):
     val = 0
     for i in range(len(obs)):
-        val = val + ((obs[i] - exp[i]) ** 2) / exp[i]
+        if exp[i] >= 5:
+            val = val + ((obs[i] - exp[i]) ** 2) / exp[i]
     return val
 
 
@@ -72,9 +73,6 @@ def test_generator(generator: Generator, alfa=0.05, n=100000, bins=7):
     for i in range(bins):
         next_exp = (uniform_cdf(generator.a, generator.m, curr_dist + dist) - uniform_cdf(generator.a, generator.m,
                                                                                           curr_dist)) * n
-        if next_exp < 5:
-            print(f'exp[{i}] < 5')
-            return
         exp.append(next_exp)
         curr_dist = curr_dist + dist
     values = generator.generate_array(n)
@@ -96,9 +94,6 @@ def test_uniform(generator: UniformGenerator, alfa=0.05, n=100000, bins=7):
         next_exp = (uniform_cdf(generator.generator.a / generator.generator.m, 1, curr_dist + dist) - uniform_cdf(
             generator.generator.a / generator.generator.m, 1,
             curr_dist)) * n
-        if next_exp < 5:
-            print(f'exp[{i}] < 5')
-            return
         exp.append(next_exp)
         curr_dist = curr_dist + dist
     values = generator.generate_array(n)
@@ -126,9 +121,6 @@ def test_binomial(generator: BinomialGenerator, alfa=0.05, n=100000, bins=7):
             prob = prob + (math.factorial(generator.n) / ((math.factorial(j)) * math.factorial(generator.n - j))) \
                    * (generator.bernoulli_generator.p ** j) \
                    * ((1 - generator.bernoulli_generator.p) ** (generator.n - j))
-        if n * prob < 5:
-            print(f'exp[{i}] < 5')
-            return
         exp.append(n * prob)
         curr_dist = curr_dist + dist
 
@@ -150,26 +142,10 @@ def test_exponential(generator: ExponentialGenerator, alfa=0.05, bins=7, n=10000
     for i in range(bins):
         next_exp = (exponential_cdf(curr_dist + dist, generator.lambda_value)
                     - exponential_cdf(curr_dist, generator.lambda_value)) * n
-        if next_exp < 5:
-            exp[i - 1] = exp[i - 1] + next_exp
-            bins = i
-            break
         exp.append(next_exp)
         curr_dist = curr_dist + dist
     obs = [0 for i in range(bins)]
-    for value in values:
-        curr_ind = 0
-        was_break = False
-        for i in range(bins):
-            if value < (i + 1) * dist:
-                was_break = True
-                break
-            else:
-                curr_ind = curr_ind + 1
-        if was_break:
-            obs[curr_ind] = obs[curr_ind] + 1
-        else:
-            obs[len(obs) - 1] = obs[len(obs) - 1] + 1
+    fill_obs_array(values, dist, obs, bins, 0)
     chi_square_obs = calculate_chi_square_obs(obs, exp)
     crit = sp.chi2.ppf(q=1 - alfa, df=bins - 1)
     if chi_square_obs < crit:
@@ -192,26 +168,10 @@ def test_poisson(generator: PoissonGenerator, alfa=0.05, n=100000, bins=7):
         for j in range(lower, upper + 1):
             prob = prob + ((np.exp(-generator.lambda_value) * generator.lambda_value ** j) / math.factorial(j))
         next_exp = prob * n
-        if next_exp < 5:
-            exp[i - 1] = exp[i - 1] + next_exp
-            bins = i
-            break
         exp.append(next_exp)
         curr_dist = curr_dist + dist
     obs = [0 for i in range(bins)]
-    for value in values:
-        curr_ind = 0
-        was_break = False
-        for i in range(bins):
-            if value < (i + 1) * dist:
-                was_break = True
-                break
-            else:
-                curr_ind = curr_ind + 1
-        if was_break:
-            obs[curr_ind] = obs[curr_ind] + 1
-        else:
-            obs[len(obs) - 1] = obs[len(obs) - 1] + 1
+    fill_obs_array(values, dist, obs, bins, 0)
     chi_square_obs = calculate_chi_square_obs(obs, exp)
     crit = sp.chi2.ppf(q=1 - alfa, df=bins - 1)
     if chi_square_obs < crit:
@@ -227,9 +187,6 @@ def test_normal(generator: NormalGenerator, alfa=0.05, n=100000, bins = 7):
     exp = []
     for i in range(bins):
         next_exp = quad(standard_normal_pdf, curr_dist, curr_dist + dist)[0] * n
-        if next_exp < 5:
-            print(f'exp[{i}] < 5')
-            return
         exp.append(next_exp)
         curr_dist = curr_dist + dist
     obs = [0 for i in range(bins)]

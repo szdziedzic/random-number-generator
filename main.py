@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-# import numpy as np
+import numpy as np
 from random_number_generator.generator import Generator
 from random_number_generator.uniform_generator import UniformGenerator
 from random_number_generator.poisson_generator import PoissonGenerator
@@ -9,14 +9,14 @@ from random_number_generator.exponential_generator import ExponentialGenerator
 from random_number_generator.normal_generator import NormalGenerator
 import random_number_generator.chi_square as chi_square
 
-LENGTH = 10000
+LENGTH = 1000000
 
 G = Generator()
 J = UniformGenerator()
-P = PoissonGenerator()
+P = PoissonGenerator(lambda_value=2)
 B = BernoulliGenerator(p=0.3)
-D = BinomialGenerator(p=0.5, n=20)
-W = ExponentialGenerator(lambda_value=1)
+D = BinomialGenerator(p=0.2, n=50)
+W = ExponentialGenerator(lambda_value=2)
 N = NormalGenerator()
 
 G_x = G.generate_array(LENGTH)
@@ -30,10 +30,10 @@ plt.hist(J_x)
 plt.show()
 
 P_x = P.generate_array(LENGTH)
-# print(np.mean(P_x))
-# print((np.std(P_x)) ** 2)
+print(np.mean(P_x))
+print((np.std(P_x)) ** 2)
 plt.title('P')
-plt.hist(P_x, bins=max(P_x))
+plt.hist(P_x, max(P_x))
 plt.show()
 
 B_x = B.generate_array(LENGTH)
@@ -43,7 +43,7 @@ plt.show()
 
 D_x = D.generate_array(LENGTH)
 plt.title('D')
-plt.hist(D_x, bins=max(D_x))
+plt.hist(D_x, range(0, D.n))
 plt.show()
 
 W_x = W.generate_array(LENGTH)
