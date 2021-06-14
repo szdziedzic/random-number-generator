@@ -8,3 +8,6 @@ Supported distributions:
 4. Binomial
 5. Geometric
 6. Poisson
+7. Standard normal
+
+Provides method of testing each if generators using chi-square technique and file generator diehard runs test for main generator.
