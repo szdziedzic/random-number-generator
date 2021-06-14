@@ -9,7 +9,7 @@ from random_number_generator.exponential_generator import ExponentialGenerator
 from random_number_generator.normal_generator import NormalGenerator
 import random_number_generator.chi_square as chi_square
 
-LENGTH = 1000000
+LENGTH = 10000
 
 G = Generator()
 J = UniformGenerator()

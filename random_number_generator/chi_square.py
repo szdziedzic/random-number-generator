@@ -31,8 +31,6 @@ def exponential_cdf(x, lambda_value):
 
 
 def standard_normal_pdf(x):
-    # box-mueller method generates standard normal distribution
-    # so as pdf we take fi(x)
     return np.exp((-(x ** 2)) / 2) / np.sqrt(2 * np.pi)
 
 
@@ -67,13 +65,18 @@ def test_bernoulli(generator: BernoulliGenerator, alfa=0.05, n=100000):
 
 def test_generator(generator: Generator, alfa=0.05, n=100000, bins=7):
     dist = generator.m / bins
-    curr_dist = generator.a
+    curr_dist = 0
     exp = []
     obs = [0 for i in range(bins)]
     for i in range(bins):
-        next_exp = (uniform_cdf(generator.a, generator.m, curr_dist + dist) - uniform_cdf(generator.a, generator.m,
-                                                                                          curr_dist)) * n
-        exp.append(next_exp)
+        lower = 0
+        if curr_dist != 0:
+            lower = int(curr_dist) + 1
+        upper = int(curr_dist + dist)
+        prob = 0
+        for j in range(lower, upper + 1):
+            prob = prob + (1 / generator.m)
+        exp.append(n * prob)
         curr_dist = curr_dist + dist
     values = generator.generate_array(n)
     fill_obs_array(values, dist, obs, bins, generator.a)
@@ -87,13 +90,11 @@ def test_generator(generator: Generator, alfa=0.05, n=100000, bins=7):
 
 def test_uniform(generator: UniformGenerator, alfa=0.05, n=100000, bins=7):
     dist = 1 / bins
-    curr_dist = generator.generator.a / generator.generator.m
+    curr_dist = 0
     exp = []
     obs = [0 for i in range(bins)]
     for i in range(bins):
-        next_exp = (uniform_cdf(generator.generator.a / generator.generator.m, 1, curr_dist + dist) - uniform_cdf(
-            generator.generator.a / generator.generator.m, 1,
-            curr_dist)) * n
+        next_exp = (uniform_cdf(0, 1, curr_dist + dist) - uniform_cdf(0, 1, curr_dist)) * n
         exp.append(next_exp)
         curr_dist = curr_dist + dist
     values = generator.generate_array(n)
@@ -136,7 +137,7 @@ def test_binomial(generator: BinomialGenerator, alfa=0.05, n=100000, bins=7):
 
 def test_exponential(generator: ExponentialGenerator, alfa=0.05, bins=7, n=100000):
     values = generator.generate_array(n)
-    dist = (max(values) - 0) / bins
+    dist = max(values) / bins
     curr_dist = 0
     exp = []
     for i in range(bins):
@@ -180,7 +181,7 @@ def test_poisson(generator: PoissonGenerator, alfa=0.05, n=100000, bins=7):
         print(f'POISSON TEST FAILED - crit={crit} chi_square_obs={chi_square_obs}')
 
 
-def test_normal(generator: NormalGenerator, alfa=0.05, n=100000, bins = 7):
+def test_normal(generator: NormalGenerator, alfa=0.05, n=100000, bins=7):
     values = generator.generate_array(n)
     dist = (max(values) - min(values)) / bins
     curr_dist = min(values)
