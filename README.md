@@ -8,6 +8,6 @@ Supported distributions:
 4. Binomial
 5. Geometric
 6. Poisson
-7. Standard normal
+7. Normal standarized (Z = N(0, 1))
 
 Provides method of testing each if generators using chi-square technique and file generator for dieharder runs test for main generator.
