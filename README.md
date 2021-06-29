@@ -10,4 +10,4 @@ Supported distributions:
 6. Poisson
 7. Standard normal
 
-Provides method of testing each if generators using chi-square technique and file generator for diehard runs test for main generator.
+Provides method of testing each if generators using chi-square technique and file generator for dieharder runs test for main generator.
