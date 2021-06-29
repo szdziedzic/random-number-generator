@@ -2,7 +2,7 @@
 
 Different kinds of RNGs generating most popular probability distrubutions implemented from scratch without using time parameters.
 Supported distributions:
-1. Uniform
+1. Discrete uniform (Main multiplicative generator)
 2. Uniform (0, 1]
 3. Bernoulli
 4. Binomial
